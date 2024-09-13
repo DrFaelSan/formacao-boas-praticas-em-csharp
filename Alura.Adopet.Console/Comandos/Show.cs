@@ -1,4 +1,5 @@
 ﻿using Alura.Adopet.Console.Utils;
+using FluentResults;
 
 namespace Alura.Adopet.Console.Comandos;
 
@@ -6,18 +7,24 @@ namespace Alura.Adopet.Console.Comandos;
     documentacao: "adopet show   <arquivo> comando que exibe no terminal o conteúdo do arquivo importado." + "\n\n\n\n")]
 public class Show : IComando
 {
-    public Task ExecutarAsync(string[] args)
-    {
-        ExibirArquivosAImportados(caminhoArquivoASerExibido: args[1]);
-        return Task.CompletedTask;
-    }
+    private readonly LeitorDeArquivo _leitor;
 
-    private void ExibirArquivosAImportados(string caminhoArquivoASerExibido)
-    {
-        LeitorDeArquivo leitor = new();
-        var listaDePets = leitor.RealizaLeitura(caminhoArquivoASerExibido);
-        foreach (var pet in listaDePets)
-            System.Console.WriteLine(pet);
+    public Show(LeitorDeArquivo leitor)
+        =>  _leitor = leitor;
 
+    public async Task<Result> ExecutarAsync()
+        =>  await Task.FromResult(ExibirArquivosAImportados());
+
+    private Result ExibirArquivosAImportados()
+    {
+        try
+        {
+            var listaDePets = _leitor.RealizaLeitura();
+            return Result.Ok().WithSuccess(new SuccessWithPets(listaDePets));
+        }
+        catch (Exception ex)
+        {
+            return Result.Fail(new Error("Exibição do arquivo falhou!").CausedBy(ex));
+        }
     }
 }

@@ -1,5 +1,5 @@
 ﻿using Alura.Adopet.Console.Utils;
-using System.Reflection;
+using FluentResults;
 
 namespace Alura.Adopet.Console.Comandos;
 
@@ -9,33 +9,42 @@ namespace Alura.Adopet.Console.Comandos;
 public class Help : IComando
 {
     private Documentacao Documentacao;
+    private string? _comando;
 
-    public Help()
-        =>  Documentacao = new();
-    
-    public Task ExecutarAsync(string[] args)
+    public Help(string? comando)
     {
-        ListarComandos(args);
-        return Task.CompletedTask;
+        _comando = comando;
+        Documentacao = new();
+
     }
 
-    private void ListarComandos(string[] comandos)
+    public Task<Result> ExecutarAsync()
     {
-        System.Console.WriteLine("Lista de comandos.");
-        if (comandos.Length == 1)
+        try
         {
-            System.Console.WriteLine("Adopet (1.0) - Aplicativo de linha de comando (CLI).");
-            System.Console.WriteLine("Realiza a importação em lote de um arquivos de pets.");
-            System.Console.WriteLine("Comando possíveis: ");
-            Documentacao.ListarDocumentacaoDeTodosComandos();
+            return Task.FromResult(Result.Ok()
+                .WithSuccess(new SuccessWithDocs(GerarDocumentacao())));
         }
-        // exibe o help daquele comando específico
-        else if (comandos.Length == 2)
+        catch (Exception ex)
         {
-            string comandoASerExibido = comandos[1];
-            string? helpComando = Documentacao[comandoASerExibido];
-            if(helpComando is not null)
-                System.Console.WriteLine(helpComando);
+            return Task.FromResult(Result.Fail(new Error("Exibição da documentação falhou!").CausedBy(ex)));
         }
+    }
+
+    private IEnumerable<string> GerarDocumentacao()
+    {
+        List<string> resultado = new();
+        if (_comando is null)
+            resultado.AddRange(Documentacao.ListarDocumentacaoDeTodosComandos());
+        else
+        {
+            string? helpComando = Documentacao[_comando];
+            if (helpComando is not null)
+                resultado.Add(helpComando);
+            else
+                resultado.Add("Comando não encontrado!");
+        }
+
+        return resultado;
     }
 }

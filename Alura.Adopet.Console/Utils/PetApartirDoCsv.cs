@@ -1,4 +1,5 @@
-﻿using Alura.Adopet.Console.Modelos;
+﻿using System;
+using Alura.Adopet.Console.Modelos;
 
 namespace Alura.Adopet.Console.Utils;
 public static class PetApartirDoCsv
@@ -9,7 +10,7 @@ public static class PetApartirDoCsv
 
         if(string.IsNullOrEmpty(linhaCsv)) throw new ArgumentException("Texto não pode ser vazio!");
 
-        if (propriedades.Length != 3) throw new ArgumentException("TextoInválido");
+        if (propriedades.Length != 3) throw new ArgumentException("Texto Inválido");
 
         bool sucesso = Guid.TryParse(propriedades[0], out Guid petId);
         if (!sucesso) throw new ArgumentException("Guid inválido!");

@@ -14,11 +14,10 @@ public class Documentacao
            .ToDictionary(d => d.Instrucao);
     }
 
-    public void ListarDocumentacaoDeTodosComandos()
-    {
-         foreach (var doc in docs.Values)
-                System.Console.WriteLine(doc.Documentacao);
-    }
+    public IEnumerable<string> ListarDocumentacaoDeTodosComandos()
+        => docs.Values
+            .Select(doc => doc.Documentacao)
+            .ToList();
 
     public IEnumerable<DocComandoAttribute> ListarDocComando()
         => docs.Values.ToList();

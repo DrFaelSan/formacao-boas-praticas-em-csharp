@@ -1,4 +1,7 @@
-﻿using Alura.Adopet.Console.Servicos;
+﻿using Alura.Adopet.Console.Modelos;
+using Alura.Adopet.Console.Servicos;
+using Alura.Adopet.Console.Utils;
+using FluentResults;
 
 namespace Alura.Adopet.Console.Comandos;
 
@@ -6,17 +9,23 @@ namespace Alura.Adopet.Console.Comandos;
     documentacao: "adopet list comando que exibe no terminal o conteúdo cadastrado na base de dados da Adopet.")]
 public class List : IComando
 {
-    private readonly HttpClientPet httpClientPet;
+    private readonly HttpClientPet _httpClientPet;
 
-    public List() => httpClientPet = new HttpClientPet();
+    public List(HttpClientPet httpClientPet) => _httpClientPet = httpClientPet;
 
-    public async Task ExecutarAsync(string[] args)
+    public async Task<Result> ExecutarAsync()
         => await ListarPetsExistentesAsync();
 
-    private async Task ListarPetsExistentesAsync()
+    private async Task<Result> ListarPetsExistentesAsync()
     {
-        var pets = await httpClientPet.ListPetsAsync();
-        foreach (var pet in pets)
-            System.Console.WriteLine(pet);
+        try
+        {
+            var pets = await _httpClientPet.ListPetsAsync() ?? Enumerable.Empty<Pet>();
+            return Result.Ok().WithSuccess(new SuccessWithPets(pets));
+        }
+        catch (Exception ex)
+        {
+            return Result.Fail(new Error("Listagem falhou!").CausedBy(ex));
+        }
     }
 }
