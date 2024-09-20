@@ -1,4 +1,4 @@
-﻿using Alura.Adopet.Console.Utils;
+﻿using Alura.Adopet.Console.Results;
 using FluentResults;
 
 namespace Alura.Adopet.Console.UI;
@@ -6,7 +6,7 @@ public static class ConsoleUI
 {
     public static void ExibeResultado(Result result)
     {
-        System.Console.Clear();
+        //System.Console.Clear();
         System.Console.ForegroundColor = ConsoleColor.Green;
         try
         {
@@ -29,10 +29,21 @@ public static class ConsoleUI
             case SuccessWithPets s:
                 ExibirPets(s);
                 break;
+            case SuccessWithClientes c:
+                ExibeClientes(c);
+                break;
             case SuccessWithDocs d:
                 ExibeDocumentacao(d);
                 break;
         }
+    }
+
+    private static void ExibeClientes(SuccessWithClientes clientes)
+    {
+        foreach (var cliente in clientes.Data)
+            System.Console.WriteLine(cliente);
+
+        System.Console.WriteLine(clientes.Message);
     }
 
     private static void ExibeDocumentacao(SuccessWithDocs documentacaoComando)

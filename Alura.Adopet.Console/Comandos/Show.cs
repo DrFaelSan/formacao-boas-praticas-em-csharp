@@ -1,4 +1,6 @@
-﻿using Alura.Adopet.Console.Utils;
+﻿using Alura.Adopet.Console.Modelos;
+using Alura.Adopet.Console.Results;
+using Alura.Adopet.Console.Servicos.Abstracoes;
 using FluentResults;
 
 namespace Alura.Adopet.Console.Comandos;
@@ -7,24 +9,26 @@ namespace Alura.Adopet.Console.Comandos;
     documentacao: "adopet show   <arquivo> comando que exibe no terminal o conteúdo do arquivo importado." + "\n\n\n\n")]
 public class Show : IComando
 {
-    private readonly LeitorDeArquivo _leitor;
+    private readonly ILeitorDeArquivos<Pet> _leitor;
 
-    public Show(LeitorDeArquivo leitor)
-        =>  _leitor = leitor;
+    public Show(ILeitorDeArquivos<Pet> leitor)
+        => _leitor = leitor;
 
     public async Task<Result> ExecutarAsync()
-        =>  await Task.FromResult(ExibirArquivosAImportados());
-
-    private Result ExibirArquivosAImportados()
     {
         try
         {
-            var listaDePets = _leitor.RealizaLeitura();
-            return Result.Ok().WithSuccess(new SuccessWithPets(listaDePets));
+            return await Task.FromResult(ExibirArquivosAImportados());
         }
         catch (Exception ex)
         {
-            return Result.Fail(new Error("Exibição do arquivo falhou!").CausedBy(ex));
+            return await Task.FromResult(Result.Fail(new Error("Exibição do arquivo falhou!").CausedBy(ex)));
         }
+    }
+
+    private Result ExibirArquivosAImportados()
+    {
+        var listaDePets = _leitor.RealizaLeitura();
+        return Result.Ok().WithSuccess(new SuccessWithPets(listaDePets, "Exibição do arquivo realizada com sucesso!"));
     }
 }

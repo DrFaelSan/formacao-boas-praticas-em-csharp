@@ -1,4 +1,5 @@
-﻿using Alura.Adopet.Console.Utils;
+﻿using Alura.Adopet.Console.Results;
+using Alura.Adopet.Console.Utils;
 using FluentResults;
 
 namespace Alura.Adopet.Console.Comandos;
@@ -42,7 +43,10 @@ public class Help : IComando
             if (helpComando is not null)
                 resultado.Add(helpComando);
             else
+            {
                 resultado.Add("Comando não encontrado!");
+                throw new ArgumentException();
+            }
         }
 
         return resultado;

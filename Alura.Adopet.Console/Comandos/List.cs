@@ -1,6 +1,6 @@
 ﻿using Alura.Adopet.Console.Modelos;
-using Alura.Adopet.Console.Servicos;
-using Alura.Adopet.Console.Utils;
+using Alura.Adopet.Console.Results;
+using Alura.Adopet.Console.Servicos.Abstracoes;
 using FluentResults;
 
 namespace Alura.Adopet.Console.Comandos;
@@ -9,9 +9,9 @@ namespace Alura.Adopet.Console.Comandos;
     documentacao: "adopet list comando que exibe no terminal o conteúdo cadastrado na base de dados da Adopet.")]
 public class List : IComando
 {
-    private readonly HttpClientPet _httpClientPet;
+    private readonly IApiService<Pet> _httpClientPet;
 
-    public List(HttpClientPet httpClientPet) => _httpClientPet = httpClientPet;
+    public List(IApiService<Pet> httpClientPet) => _httpClientPet = httpClientPet;
 
     public async Task<Result> ExecutarAsync()
         => await ListarPetsExistentesAsync();
@@ -20,7 +20,7 @@ public class List : IComando
     {
         try
         {
-            var pets = await _httpClientPet.ListPetsAsync() ?? Enumerable.Empty<Pet>();
+            var pets = await _httpClientPet.ListAsync() ?? Enumerable.Empty<Pet>();
             return Result.Ok().WithSuccess(new SuccessWithPets(pets));
         }
         catch (Exception ex)

@@ -23,5 +23,13 @@ public class Documentacao
         => docs.Values.ToList();
 
     public string? this[string key] => docs.TryGetValue(key, out DocComandoAttribute? documentacaoDesejada) ? documentacaoDesejada.Documentacao : null;
-     
+
+    public static Dictionary<string, DocComandoAttribute> ToDictionary(Assembly assemblyComOTipoDocComando)
+    {
+        return assemblyComOTipoDocComando.GetTypes()
+         .Where(t => t.GetCustomAttributes<DocComandoAttribute>().Any())
+         .Select(t => t.GetCustomAttribute<DocComandoAttribute>()!)
+         .ToDictionary(d => d.Instrucao);
+    }
+
 }
